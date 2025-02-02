@@ -7,30 +7,44 @@ const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
+  const [totalQuantity, setTotalQuantity] = useState(0);
+
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
- 
+    return cart.reduce((total, item) => total + (item.cost * item.quantity), 0);
   };
 
   const handleContinueShopping = (e) => {
-   
+    onContinueShopping();   
   };
 
 
 
   const handleIncrement = (item) => {
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
   };
 
   const handleDecrement = (item) => {
+    if (item.quantity === 1) {
+      dispatch(removeItem(item));
+    } else {
+      dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
+    }
    
   };
 
   const handleRemove = (item) => {
+    dispatch(removeItem(item));
   };
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
+     return item.cost * item.quantity;
   };
+
+  useEffect(() => {
+    updateTotalQuantity();
+  }, [cart]);
 
   return (
     <div className="cart-container">
@@ -53,7 +67,9 @@ const CartItem = ({ onContinueShopping }) => {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
+      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'>{/* Exibe o total de itens no carrinho */}
+        <h3>Total Items in Cart: {totalQuantity}</h3>
+      </div>
       <div className="continue_shopping_btn">
         <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
